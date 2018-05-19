@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Print</title>
+    <link rel="Shortcut Icon" href="./img/icon.jpg">
+    <link href="http://cdn.bootcss.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="./js/button.js"></script>
+    <link rel="stylesheet" href="./css/button.css">
+</head>
+<style>
+    body {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    #draw {
+        height: 600px;
+        width: 600px;
+        margin: auto;
+        margin-top: 10px;
+    }
+
+    #save {
+        margin-top: 5px;
+    }
+
+    canvas {
+        cursor: url('./img/icon.jpg'), auto;
+    }
+</style>
+
+<body style="background-color:#ccc">
+    <div id="draw">
+        <canvas id="mycanvas" height="500" width="600" style="background-color: #fff"></canvas>
+        <br>
+        <button id="reset" class="button button-action button-rounded">清空画板</button>
+        <button id="color_0" class="button button-caution button-box button-small" style="background-color: black">黑</button>
+        <button id="color_1" class="button button-primary button-box button-small">蓝</button>
+        <button id="color_2" class="button button-action button-box button-small">绿</button>
+        <button id="color_3" class="button button-caution button-box button-small">红</button>
+        <span class="button-dropdown" data-buttons="dropdown">
+            <button class="button button-rounded">
+                画笔粗细
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <ul class="button-dropdown-list">
+                <li id="wth_1">
+                    <a>1</a>
+                </li>
+                <li id="wth_2">
+                    <a>2</a>
+                </li>
+                <li id="wth_3">
+                    <a>3</a>
+                </li>
+            </ul>
+        </span>
+        <button id="eraser" class="button button-rounded">橡皮擦</button>
+        <a id="save" class="button button-block button-rounded button-highlight button-large">保存</a>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        var cvs = document.getElementById("mycanvas");
+        var plt = document.getElementById("mycanvas").getContext("2d");
+        var btn_1 = document.getElementById("reset");
+        var black = document.getElementById("color_0");
+        var blue = document.getElementById("color_1");
+        var green = document.getElementById("color_2");
+        var red = document.getElementById("color_3");
+        var wth_1 = document.getElementById("wth_1");
+        var wth_2 = document.getElementById("wth_2");
+        var wth_3 = document.getElementById("wth_3");
+        var eraser = document.getElementById("eraser");
+        var save = document.getElementById("save");
+        var is_eraser = false;
+        //  plt.fillStyle = "#000";
+        //  plt.strokeStyle = "#999"
+        //  plt.lineWidth = 10;
+        //  plt.lineJoin = "round";
+        //  plt.fillRect(10,10,100,100);
+        //  plt.strokeRect(10,10,100,100)
+
+        //  plt.beginPath();
+        //  plt.moveTo(10,10);
+        //  plt.lineTo(10,100);
+        //  plt.lineTo(100,100);
+        //  plt.closePath();
+        //  plt.stroke();
+
+        cvs.onmouseover = function (ev) {
+            ev.preventDefault();
+        }
+
+        cvs.onmousedown = function (ev) {
+            //每次都从一个新起点开始，会默认结束上一个。写restore的话会闭合图像
+            plt.beginPath();
+            plt.moveTo(ev.pageX - cvs.offsetLeft, ev.pageY - cvs.offsetTop);
+            cvs.onmousemove = function (ev) {
+                plt.lineTo(ev.pageX - cvs.offsetLeft, ev.pageY - cvs.offsetTop);
+                plt.stroke();
+            }
+        }
+
+        document.onmouseup = function () {
+            cvs.onmousemove = null;
+        }
+
+        btn_1.onclick = function () {
+            plt.clearRect(0, 0, 600, 500);
+        }
+
+        black.onclick = function () {
+            if (!is_eraser) {
+                plt.strokeStyle = "rgb(0,0,0)";
+            }
+        }
+        blue.onclick = function () {
+            if (!is_eraser) {
+                plt.strokeStyle = "rgb(71,174,249)";
+            }
+        }
+        green.onclick = function () {
+            if (!is_eraser) {
+                plt.strokeStyle = "rgb(165,222,55)";
+            }
+        }
+        red.onclick = function () {
+            if (!is_eraser) {
+                plt.strokeStyle = "rgb(255,67,81)";
+            }
+        }
+
+        wth_1.onclick = function () {
+            if (!is_eraser) {
+                plt.lineWidth = 1;
+            }
+        }
+        wth_2.onclick = function () {
+            if (!is_eraser) {
+                plt.lineWidth = 3;
+            }
+        }
+        wth_3.onclick = function () {
+            if (!is_eraser) {
+                plt.lineWidth = 5;
+            }
+        }
+
+        eraser.onclick = function () {
+            if (!is_eraser) {
+                plt.save();
+                plt.strokeStyle = "rgb(255,255,255)";
+                plt.lineWidth = 12;
+                eraser.innerHTML = "点击取消";
+                is_eraser = true;
+                $(cvs).css("cursor", "url('./img/icon.jpg'),auto");
+            } else {
+                plt.restore();
+                eraser.innerHTML = "橡皮擦";
+                is_eraser = false;
+                $(cvs).css("cursor", "url('./img/icon.jpg'),auto");
+            }
+        }
+
+        save.onclick = function () {
+            //抄的，不理解为什么这样
+            var image = cvs.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            window.location.href = image;
+        }
+    }
+</script>
+
+</html>
